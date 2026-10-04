@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="0; url=pages/cadastro.html">
     <title>PlanDev</title>
 </head>
 <body>
-    <p>Abrindo o PlanDev. Se não redirecionar, <a href="pages/cadastro.html">clique aqui</a>.</p>
+    <p>Abrindo o PlanDev. Se não redirecionar, <a id="cadastro-link" href="cadastro.html">clique aqui</a>.</p>
+    <script>
+        const paginaCadastro = location.hostname.endsWith("github.io")
+            ? "cadastro.html"
+            : "pages/cadastro.html";
+        document.getElementById("cadastro-link").href = paginaCadastro;
+        location.replace(new URL(paginaCadastro, location.href));
+    </script>
 </body>
 </html>
