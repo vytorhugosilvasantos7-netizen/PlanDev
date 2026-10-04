@@ -1,0 +1,89 @@
+/* Complementos do dashboard (carregar depois do dashboard.css) */
+.timer-ring { background: conic-gradient(#fff calc(var(--p, 100) * 1%), rgba(255, 255, 255, 0.12) 0); }
+.sub { margin: 26px 0 12px; font-size: 1.05rem; }
+.dica { color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+.form-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.text-button.sm { padding: 6px 12px; font-size: 0.8rem; }
+.project-panel, .portfolio-panel { align-content: start; }
+
+.code-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.project-form textarea.code { font-family: "Consolas", "Courier New", monospace; font-size: 0.82rem; line-height: 1.5; white-space: pre; overflow: auto; }
+.project-form input[type="date"], .project-form input[type="time"] { color-scheme: dark; }
+.project-form input:disabled { opacity: 0.6; }
+
+/* Avisos e toast */
+.alertas { display: grid; gap: 10px; }
+.alertas:empty { display: none; }
+.alerta { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border: 1px solid #fff; border-radius: 12px; background: rgba(255, 255, 255, 0.08); font-weight: 600; animation: rowIn 0.4s ease; }
+.alerta.hoje { background: #fff; color: #000; }
+.alerta button { border: none; background: transparent; color: inherit; font-size: 1.2rem; cursor: pointer; line-height: 1; }
+.toast { position: fixed; right: 20px; bottom: 20px; z-index: 50; max-width: min(380px, calc(100vw - 40px)); padding: 12px 16px; border-radius: 12px; background: #000; color: #fff; border: 1px solid #fff; font-size: 0.9rem; opacity: 0; transform: translateY(10px); pointer-events: none; transition: 0.25s ease; }
+.toast.on { opacity: 1; transform: none; }
+
+/* Rodador de código */
+.runner { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: rgba(10, 10, 10, 0.8); }
+.runner[hidden] { display: none; }
+.runner-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.runner-acoes { display: flex; gap: 8px; flex-wrap: wrap; }
+.runner-stage { display: flex; justify-content: center; background: #1a1a1a; padding: 12px; }
+.runner-stage iframe { width: 100%; max-width: 100%; height: 420px; border: 0; border-radius: 8px; background: #fff; opacity: 0; transition: opacity 0.35s ease, width 0.3s ease; }
+.runner-stage iframe.pronto { opacity: 1; }
+.runner-console { min-height: 44px; max-height: 150px; overflow: auto; padding: 10px 14px; border-top: 1px solid var(--line); font: 0.8rem/1.5 "Consolas", "Courier New", monospace; color: var(--muted); white-space: pre-wrap; }
+.runner-console:empty::before { content: "> console (nada por aqui ainda)"; }
+
+.checks { list-style: none; display: grid; gap: 8px; }
+.checks li { padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(10, 10, 10, 0.75); }
+.checks li::before { display: inline-block; width: 1.4em; font-weight: 800; }
+.checks li.ok::before { content: "✓"; }
+.checks li.falha { border-style: dashed; color: var(--muted); }
+.checks li.falha::before { content: "✕"; color: #fff; }
+.checks li.espera::before { content: "…"; }
+
+/* Calendário, entrevistas e metas */
+.rel-grid { display: grid; grid-template-columns: minmax(260px, 340px) 1fr; gap: 20px; align-items: start; }
+.rel-grid .kanban-stack { margin-top: 14px; }
+.cal-box { padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: rgba(10, 10, 10, 0.75); }
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; text-transform: capitalize; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+.cal-dow { color: var(--muted); font-size: 0.72rem; padding: 4px 0; }
+.cal-dia { position: relative; aspect-ratio: 1; border: 1px solid transparent; border-radius: 10px; background: transparent; color: var(--text); cursor: pointer; font-size: 0.85rem; }
+.cal-dia:hover { background: rgba(255, 255, 255, 0.12); }
+.cal-dia.hoje { border-color: var(--line); }
+.cal-dia.sel { background: #fff; color: #000; }
+.cal-dia.marcado::after { content: ""; position: absolute; left: 50%; bottom: 4px; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: currentColor; }
+.lado { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.barra { height: 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.12); overflow: hidden; margin: 14px 0 6px; }
+.barra i { display: block; height: 100%; width: 0; background: #fff; transition: width 0.6s ease; }
+.meta-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #fff; margin-right: 10px; flex: none; }
+.meta-item.feita .task-name { text-decoration: line-through; color: var(--muted); }
+.meta-esq { display: flex; align-items: center; min-width: 0; }
+
+/* Perfil e configurações */
+.perfil-topo { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.perfil-topo small { display: block; color: var(--muted); margin-top: 2px; }
+.avatar-btn { position: relative; width: 72px; height: 72px; border-radius: 50%; border: 2px solid #fff; background: #1a1a1a; color: #fff; font-size: 1.7rem; font-weight: 800; cursor: pointer; overflow: hidden; display: grid; place-items: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.avatar-btn:hover { transform: scale(1.05); box-shadow: 0 0 24px rgba(255, 255, 255, 0.3); }
+.avatar-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.perfil-menu { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; padding: 8px; border: 1px solid var(--line); border-radius: 14px; background: rgba(10, 10, 10, 0.8); animation: rowIn 0.25s ease; }
+.perfil-menu[hidden], .set-painel[hidden] { display: none; }
+.perfil-menu button, .tema-opcoes button { border: 1px solid transparent; background: transparent; color: var(--text); border-radius: 10px; padding: 9px 16px; cursor: pointer; font-weight: 600; }
+.perfil-menu button:hover, .perfil-menu button.active { background: rgba(255, 255, 255, 0.12); border-color: var(--line); }
+.set-painel { animation: rowIn 0.25s ease; }
+.tema-opcoes { display: flex; gap: 12px; }
+.tema-opcoes button { border-color: var(--line); padding: 14px 28px; }
+.tema-opcoes button[aria-pressed="true"] { background: #fff; color: #000; }
+.sobre { display: grid; gap: 12px; max-width: 70ch; line-height: 1.7; color: var(--muted); }
+.sobre h3 { color: var(--text); }
+
+/* Tema branco: a interface é toda em tons de cinza, então basta inverter */
+html[data-tema="claro"] body { background: #fff; }
+html[data-tema="claro"] .app-shell, html[data-tema="claro"] #bg-code { filter: invert(1); }
+html[data-tema="claro"] .app-shell img, html[data-tema="claro"] .app-shell iframe { filter: invert(1); }
+html[data-tema="claro"] .project-form input[type="date"], html[data-tema="claro"] .project-form input[type="time"] { color-scheme: dark; }
+
+@media (max-width: 980px) {
+  .code-grid, .rel-grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .alerta, .perfil-menu, .set-painel, .runner-stage iframe, .barra i, .toast { animation: none; transition: none; }
+}
