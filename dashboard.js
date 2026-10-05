@@ -63,6 +63,7 @@
   let uid = "local";
   let servidor = null;
   const modoLocal = window.location.protocol === "file:" || window.location.hostname.endsWith("github.io");
+  let publicacoesOnline = [];
   let S = padrao();
   let salvarTimer = null;
   let filaSalvamento = Promise.resolve();
@@ -135,9 +136,12 @@
     });
     $$(".view-panel").forEach((s) => s.classList.toggle("active", s.dataset.view === view));
     if (view === "relatorios") renderCal();
+    if (view === "online") carregarComunidade();
   }
   $$(".nav-item").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); ir(a.dataset.view); }));
   $("btn-ver-projetos").addEventListener("click", () => ir("projetos"));
+  $("community-refresh").addEventListener("click", carregarComunidade);
+  $("community-search").addEventListener("input", renderComunidade);
 
   // ---------- Contagem animada ----------
   function animar(n, alvo, suf = "", pad = 0) {
@@ -284,8 +288,14 @@
       const acoes = el("div", "form-actions");
       const rodar = el("button", "text-button sm", "Rodar");
       rodar.type = "button";
+      const codigoWeb = codigoWebDoProjeto(p);
       rodar.onclick = () => rodarProjeto(p);
-      rodar.hidden = !temCodigo(p);
+      rodar.hidden = !temCodigo(codigoWeb);
+      const publicar = el("button", "text-button sm", p.publicado ? "Retirar da comunidade" : "Publicar");
+      publicar.type = "button";
+      publicar.disabled = modoLocal;
+      publicar.title = modoLocal ? "A publicação precisa do backend PlanDev hospedado." : "";
+      publicar.onclick = () => alternarPublicacaoProjeto(p);
       const del = el("button", "text-button sm", "Excluir");
       del.type = "button";
       del.onclick = () => {
@@ -293,7 +303,7 @@
         S.projetos = S.projetos.filter((x) => x.id !== p.id);
         salvar(); renderProjetos(); renderStats();
       };
-      acoes.append(el("span", "status " + (CLASSE_STATUS[p.status] || "active"), p.status), rodar, del);
+      acoes.append(el("span", "status " + (CLASSE_STATUS[p.status] || "active"), p.status), rodar, publicar, del);
       card.append(topo, conteudo, acoes);
       return card;
     }) : [vazio("Nenhum projeto cadastrado.")]));
@@ -307,6 +317,131 @@
     }) : [vazio("Nenhum projeto cadastrado.")]));
   }
 
+  async function persistirPublicacao() {
+    if (modoLocal || !servidor) {
+      throw new Error("A comunidade online precisa do backend PlanDev hospedado. No GitHub Pages, a publicação fica indisponível.");
+    }
+    clearTimeout(salvarTimer);
+    await filaSalvamento;
+    const response = await fetch("/api/workspace", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ workspace: S }),
+    });
+    const data = await response.json();
+    if (response.status === 401) {
+      window.location.replace("/pages/login.html");
+      throw new Error("Sua sessão expirou. Entre novamente.");
+    }
+    if (!response.ok) throw new Error(data.message || "Não foi possível salvar a publicação.");
+  }
+
+  async function alternarPublicacaoProjeto(projeto) {
+    if (modoLocal) {
+      toast("Para publicar na comunidade, o backend PlanDev precisa estar hospedado. GitHub Pages não oferece essa API.");
+      return;
+    }
+    const anterior = Boolean(projeto.publicado);
+    projeto.publicado = !anterior;
+    salvarLocal();
+    renderProjetos();
+    try {
+      await persistirPublicacao();
+      toast(projeto.publicado ? "Projeto publicado na comunidade." : "Projeto retirado da comunidade.");
+      if ($(".view-panel[data-view='online'].active")) await carregarComunidade();
+    } catch (error) {
+      projeto.publicado = anterior;
+      salvarLocal();
+      renderProjetos();
+      toast(error instanceof Error ? error.message : "Não foi possível atualizar a publicação.");
+    }
+  }
+
+  function renderComunidade() {
+    const termo = $("community-search").value.trim().toLocaleLowerCase();
+    const projetos = publicacoesOnline.filter((item) => item.tipo === "project").filter((item) => (
+      [item.nome, item.autor, item.detalhes, ...(Array.isArray(item.linguagens) ? item.linguagens : [])]
+        .join(" ").toLocaleLowerCase().includes(termo)
+    ));
+    const portfolios = publicacoesOnline.filter((item) => item.tipo === "portfolio").filter((item) => (
+      [item.nome, item.autor, item.cargo, item.bio, item.skills].join(" ").toLocaleLowerCase().includes(termo)
+    ));
+
+    $("community-projects").replaceChildren(...(projetos.length ? projetos.map((item) => {
+      const card = el("article", "community-card");
+      const heading = el("div", "project-card-header");
+      heading.append(el("h4", "", item.nome || "Projeto sem nome"));
+      const languages = Array.isArray(item.linguagens) ? item.linguagens.join(", ") : "";
+      if (languages) heading.append(el("span", "language-tag", languages));
+      card.append(heading, el("p", "community-author", `Publicado por ${item.autor || "Programador"}`));
+      if (item.detalhes) card.append(el("p", "community-description", item.detalhes));
+
+      const codigos = item.codigos && typeof item.codigos === "object" ? item.codigos : {};
+      const codeEntries = Object.entries(codigos).filter(([, source]) => typeof source === "string" && source);
+      if (codeEntries.length) {
+        const source = el("details", "project-source");
+        source.append(el("summary", "", "Ver código publicado"));
+        codeEntries.forEach(([language, code]) => source.append(el("h4", "", language), el("pre", "", code)));
+        card.append(source);
+      }
+      const codigoWeb = codigoWebDoProjeto({ codigos });
+      if (temCodigo(codigoWeb)) {
+        const button = el("button", "text-button sm", "Ver projeto");
+        button.type = "button";
+        button.onclick = () => {
+          runOnline.rodar(codigoWeb, `Projeto de ${item.autor || "programador"}: ${item.nome || "Projeto"}`);
+          runOnline.host.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
+        };
+        card.append(button);
+      }
+      return card;
+    }) : [vazio(termo ? "Nenhum projeto encontrado." : "Ainda não há projetos publicados.")]));
+
+    $("community-portfolios").replaceChildren(...(portfolios.length ? portfolios.map((item) => {
+      const card = el("article", "community-card");
+      card.append(
+        el("h4", "", item.nome || "Portfólio"),
+        el("p", "community-author", `Publicado por ${item.autor || "Programador"}`),
+        el("p", "community-role", item.cargo || ""),
+        el("p", "community-description", item.bio || ""),
+      );
+      const skills = String(item.skills || "").split(",").map((skill) => skill.trim()).filter(Boolean);
+      if (skills.length) {
+        const tags = el("div", "portfolio-tags");
+        tags.replaceChildren(...skills.map((skill) => el("span", "", skill)));
+        card.append(tags);
+      }
+      return card;
+    }) : [vazio(termo ? "Nenhum portfólio encontrado." : "Ainda não há portfólios publicados.")]));
+  }
+
+  async function carregarComunidade() {
+    const notice = $("community-notice");
+    if (modoLocal) {
+      publicacoesOnline = [];
+      notice.textContent = "A comunidade online precisa do backend PlanDev hospedado. No GitHub Pages, os dados locais não são compartilhados entre programadores.";
+      renderComunidade();
+      return;
+    }
+    notice.textContent = "Carregando publicações...";
+    try {
+      const response = await fetch("/api/online");
+      const data = await response.json();
+      if (!response.ok || !Array.isArray(data.publicacoes)) {
+        throw new Error(data.message || "Não foi possível carregar a comunidade.");
+      }
+      publicacoesOnline = data.publicacoes;
+      notice.textContent = publicacoesOnline.length
+        ? `${publicacoesOnline.length} publicação(ões) compartilhada(s).`
+        : "Ainda não há publicações. Publique um projeto ou portfólio para começar.";
+      renderComunidade();
+    } catch (error) {
+      notice.textContent = error instanceof Error ? error.message : "Não foi possível carregar a comunidade.";
+      $("community-projects").replaceChildren(vazio("Publicações indisponíveis."));
+      $("community-portfolios").replaceChildren(vazio("Publicações indisponíveis."));
+    }
+  }
+
   function renderPortfolio() {
     const p = S.portfolio;
     $("portfolio-preview-name").textContent = p.nome || "Seu nome";
@@ -314,6 +449,14 @@
     $("portfolio-preview-bio").textContent = p.bio || "Preencha o formulário acima para montar o seu portfolio.";
     const tags = p.skills.split(",").map((s) => s.trim()).filter(Boolean).slice(0, 20);
     $("portfolio-preview-skills").replaceChildren(...tags.map((t) => el("span", "", t.slice(0, 30))));
+    const publicar = $("portfolio-publish");
+    publicar.textContent = p.publicado ? "Retirar portfólio da comunidade" : "Publicar meu portfólio";
+    publicar.disabled = modoLocal || !p.nome || !p.cargo || !p.bio;
+    publicar.title = modoLocal
+      ? "A publicação precisa do backend PlanDev hospedado."
+      : !p.nome || !p.cargo || !p.bio
+        ? "Preencha e salve nome, especialidade e descrição antes de publicar."
+        : "";
   }
 
   function nomeExibicao() { return S.nome || (servidor && servidor.nome) || ""; }
@@ -465,6 +608,7 @@
 
   const runP = montarRunner($("runner-proj"));
   const runPort = montarRunner($("runner-port"));
+  const runOnline = montarRunner($("runner-online"));
   const lerCodigo = (p) => ({ html: $(p + "-html").value, css: $(p + "-css").value, js: $(p + "-js").value });
   const temCodigo = (c) => (c.html + c.css + c.js).trim().length > 0;
   const exemplosCodigo = {
@@ -545,10 +689,22 @@
     };
   }
 
+  function codigoWebDoProjeto(projeto) {
+    const codigos = projeto.codigos || {};
+    return {
+      html: projeto.html || codigos.HTML || codigos.html || "",
+      css: projeto.css || codigos.CSS || codigos.css || "",
+      js: projeto.js || codigos.JavaScript || codigos.javascript || codigos.js || "",
+    };
+  }
+
   function rodarProjeto(p) {
-    if (!temCodigo(p)) return toast("Esse projeto não tem HTML, CSS ou JavaScript para rodar.");
+    const codigo = codigoWebDoProjeto(p);
+    if (!temCodigo(codigo)) {
+      return toast("A prévia do navegador executa HTML, CSS e JavaScript. Este projeto só tem código de outra linguagem.");
+    }
     ir("projetos");
-    runP.rodar(p, "Rodando: " + p.nome);
+    runP.rodar(codigo, "Rodando: " + p.nome);
     runP.host.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
   }
 
@@ -657,6 +813,30 @@
     });
     salvar(); renderPortfolio();
     toast("Portfolio atualizado.");
+  });
+  $("portfolio-publish").addEventListener("click", async () => {
+    if (modoLocal) {
+      toast("Para publicar na comunidade, o backend PlanDev precisa estar hospedado. GitHub Pages não oferece essa API.");
+      return;
+    }
+    if (!S.portfolio.nome || !S.portfolio.cargo || !S.portfolio.bio) {
+      toast("Preencha e salve nome, especialidade e descrição antes de publicar.");
+      return;
+    }
+    const anterior = Boolean(S.portfolio.publicado);
+    S.portfolio.publicado = !anterior;
+    salvarLocal();
+    renderPortfolio();
+    try {
+      await persistirPublicacao();
+      toast(S.portfolio.publicado ? "Portfólio publicado na comunidade." : "Portfólio retirado da comunidade.");
+      if ($(".view-panel[data-view='online'].active")) await carregarComunidade();
+    } catch (error) {
+      S.portfolio.publicado = anterior;
+      salvarLocal();
+      renderPortfolio();
+      toast(error instanceof Error ? error.message : "Não foi possível atualizar a publicação.");
+    }
   });
 
   // ---------- Entrevistas e metas (formulários) ----------

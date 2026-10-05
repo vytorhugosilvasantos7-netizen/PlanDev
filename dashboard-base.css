@@ -86,6 +86,18 @@ button { color: inherit; }
 .project-card h3, .task-name { margin: 0; }
 .project-card > p { color: var(--muted); line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
 .project-card-content > p { color: var(--muted); line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.community-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
+.community-columns h3 { margin: 0 0 12px; font-size: 1rem; }
+.community-list { display: grid; gap: 12px; }
+.community-card { display: grid; gap: 10px; min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: rgba(10, 10, 10, 0.7); }
+.community-card h4, .community-card p { margin: 0; overflow-wrap: anywhere; }
+.community-card .community-author, .community-card .community-role { color: var(--muted); font-size: 0.85rem; }
+.community-notice { margin: 0; color: var(--muted); line-height: 1.5; }
+.community-search { display: grid; gap: 7px; max-width: 520px; }
+.community-search span { color: var(--muted); font-size: 0.88rem; }
+.community-search input { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #0b0b0b; color: var(--text); }
+.publish-controls { display: grid; justify-items: start; gap: 8px; }
+.publish-controls .ghost-button:disabled { cursor: not-allowed; opacity: 0.55; }
 .project-source summary { width: fit-content; color: var(--muted); cursor: pointer; font-size: 0.85rem; }
 .project-source pre { max-height: 360px; margin: 10px 0 0; padding: 12px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; background: #050505; color: #ddd; font: 0.8rem/1.5 "Consolas", "Courier New", monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
 .project-item small, .task-row small { display: block; margin-top: 4px; color: var(--muted); }
@@ -148,6 +160,9 @@ button { color: inherit; }
   .stat-card { min-height: 0; }
   .panel { padding: 15px; }
   .field-row.compact-row .form-actions { justify-content: flex-start; }
+}
+@media (max-width: 800px) {
+  .community-columns { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }

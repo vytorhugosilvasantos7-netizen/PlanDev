@@ -24,6 +24,7 @@
                 <a class="nav-item active" href="#" data-view="dashboard" aria-current="page">Dashboard</a>
                 <a class="nav-item" href="#" data-view="projetos">Projetos</a>
                 <a class="nav-item" href="#" data-view="portfolio">Portfolio</a>
+                <a class="nav-item" href="#" data-view="online">Projetos da comunidade</a>
                 <a class="nav-item" href="#" data-view="relatorios">Relatórios</a>
                 <a class="nav-item" href="#" data-view="pomodoro">Pomodoro</a>
             </nav>
@@ -85,6 +86,28 @@
                 </section>
             </section>
 
+            <section class="view-panel" data-view="online">
+                <div class="panel section-panel community-panel">
+                    <div class="panel-header">
+                        <div><h2>Projetos de outros programadores</h2><p class="dica">Veja projetos que outros programadores publicaram e experimente a prévia dos projetos Web.</p></div>
+                        <button class="ghost-button" type="button" id="community-refresh">Atualizar</button>
+                    </div>
+                    <p class="community-notice" id="community-notice" role="status"></p>
+                    <label class="community-search"><span>Buscar publicações</span><input type="search" id="community-search" placeholder="Nome, programador ou linguagem"></label>
+                    <div class="community-columns">
+                        <section>
+                            <h3>Projetos publicados pela comunidade</h3>
+                            <div class="community-list" id="community-projects"></div>
+                        </section>
+                        <section>
+                            <h3>Portfólios publicados</h3>
+                            <div class="community-list" id="community-portfolios"></div>
+                        </section>
+                    </div>
+                    <div class="runner" id="runner-online" hidden></div>
+                </div>
+            </section>
+
             <section class="view-panel" data-view="projetos">
                 <div class="panel section-panel project-panel">
                     <div class="panel-header"><h2>Projetos</h2></div>
@@ -117,6 +140,7 @@
 
                         <div class="project-code-editors" id="project-code-editors"></div>
                         <small class="dica" id="project-code-help" hidden></small>
+                        <small class="dica">Ao publicar, o nome, os detalhes, as linguagens e o código preenchido deste projeto ficam visíveis para todos. Você pode retirar a publicação depois.</small>
 
                         <div class="field-row compact-row">
                             <label><span>Status</span>
@@ -127,7 +151,7 @@
                                 </select>
                             </label>
                             <div class="form-actions">
-                                <button type="button" class="ghost-button" id="project-run" hidden>Pré-visualizar</button>
+                                <button type="button" class="ghost-button" id="project-run" hidden>Rodar projeto</button>
                                 <button type="submit" class="primary-button">Adicionar projeto</button>
                             </div>
                         </div>
@@ -151,6 +175,10 @@
                         <label><span>Habilidades (separadas por vírgula)</span><input type="text" id="portfolio-skills" maxlength="300" placeholder="Ex: HTML, CSS, JavaScript" required></label>
                         <button type="submit" class="primary-button">Atualizar portfolio</button>
                     </form>
+                    <div class="publish-controls">
+                        <button class="ghost-button" type="button" id="portfolio-publish">Publicar meu portfólio</button>
+                        <small class="dica">Ao publicar, seu nome, especialidade, descrição e habilidades ficarão visíveis para todos na comunidade. Seu e-mail não será exibido.</small>
+                    </div>
 
                     <div class="portfolio-preview">
                         <div class="portfolio-header-card">
@@ -274,7 +302,8 @@
                         <h3>Sobre o PlanDev</h3>
                         <p>O PlanDev é um workspace para quem programa: um lugar para organizar projetos, mostrar seu código funcionando, preparar o portfolio, acompanhar entrevistas e manter as metas em dia.</p>
                         <p>Você cola o HTML, CSS e JavaScript do projeto e ele roda na hora, numa área isolada e segura. O portfolio ainda passa por uma verificação que aponta o que falta para ficar em perfeitas condições.</p>
-                        <p>A agenda de entrevistas avisa quando o dia se aproxima e quando chega. O Pomodoro ajuda a estudar com foco. Seus dados ficam salvos neste navegador.</p>
+                        <p>A comunidade exibe apenas projetos e portfólios que seus donos escolheram publicar. Seu e-mail não é exibido publicamente. A comunidade compartilhada exige o backend PlanDev hospedado; GitHub Pages sozinho não oferece banco ou API.</p>
+                        <p>A agenda de entrevistas avisa quando o dia se aproxima e quando chega. O Pomodoro ajuda a estudar com foco.</p>
                         <small>Feito com HTML, CSS e JavaScript.</small>
                     </div>
                 </div>

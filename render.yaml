@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: plandev
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn backend.app:app --bind 0.0.0.0:$PORT
+    disk:
+      name: plandev-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.4
+      - key: PLANDEV_SECRET_KEY
+        generateValue: true
+      - key: PLANDEV_DATABASE_PATH
+        value: /var/data/users.db
