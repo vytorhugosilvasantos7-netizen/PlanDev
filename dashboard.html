@@ -302,6 +302,11 @@
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-    <script src="../src/dashboard.js" onerror="this.onerror=null;this.src='./dashboard.js'"></script>
+    <script>
+        const dashboardScript = document.createElement("script");
+        dashboardScript.src = location.hostname.endsWith("github.io") ? "./dashboard.js" : "../src/dashboard.js";
+        dashboardScript.async = false;
+        document.body.appendChild(dashboardScript);
+    </script>
 </body>
 </html>

@@ -84,8 +84,14 @@
         </section>
     </main>
 
-    <script src="../src/cadastro.js" onerror="this.onerror=null;this.src='./cadastro.js'"></script>
-    <script src="../src/bot.js" onerror="this.onerror=null;this.src='./bot.js'"></script>
-    <script src="../src/auth.js" onerror="this.onerror=null;this.src='./auth.js'"></script>
+    <script>
+        const staticAssets = location.hostname.endsWith("github.io");
+        ["cadastro.js", "bot.js", "auth.js"].forEach((file) => {
+            const script = document.createElement("script");
+            script.src = staticAssets ? `./${file}` : `../src/${file}`;
+            script.async = false;
+            document.body.appendChild(script);
+        });
+    </script>
 </body>
 </html>

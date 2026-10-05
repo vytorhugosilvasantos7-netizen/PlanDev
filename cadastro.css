@@ -212,6 +212,12 @@ input {
   color: #525252;
 }
 
+.card-header .local-mode-note {
+  margin-top: 10px;
+  color: #525252;
+  font-size: 0.82rem;
+}
+
 .cadastro-form {
   display: grid;
   gap: 18px;

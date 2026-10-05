@@ -62,6 +62,7 @@
   });
   let uid = "local";
   let servidor = null;
+  const modoLocal = window.location.protocol === "file:" || window.location.hostname.endsWith("github.io");
   let S = padrao();
   let salvarTimer = null;
   let filaSalvamento = Promise.resolve();
@@ -120,7 +121,7 @@
   }
   function salvar() {
     salvarLocal();
-    if (!servidor) return;
+    if (modoLocal || !servidor) return;
     clearTimeout(salvarTimer);
     salvarTimer = setTimeout(() => sincronizarWorkspace(JSON.stringify(S)), 350);
   }
@@ -815,56 +816,83 @@
   const sair = document.querySelector(".logout-link");
   sair.addEventListener("click", async (e) => {
     e.preventDefault();
+    if (modoLocal) {
+      localStorage.removeItem("plandev:sessao:local:v1");
+      window.location.href = sair.getAttribute("href");
+      return;
+    }
     try { await fetch("/api/sair", { method: "POST" }); } catch { /* segue para o login */ }
     window.location.href = sair.getAttribute("href");
   });
 
   // ---------- Início ----------
   async function iniciar() {
-    try {
-      const r = await fetch("/api/eu");
-      if (r.status === 401) {
-        window.location.replace("/pages/login.html");
-        return;
-      }
-      if (!r.ok) {
-        toast("Não foi possível carregar sua conta. Tente novamente.");
-        return;
-      }
-      servidor = await r.json();
-    } catch {
-      toast("Não foi possível conectar ao PlanDev. Abra o site pelo servidor e tente novamente.");
-      return;
-    }
-    if (!servidor || !servidor.email) {
-      toast("Não foi possível identificar sua conta. Entre novamente.");
-      window.location.replace("/pages/login.html");
-      return;
-    }
-    uid = String(servidor.email).toLowerCase();
-    carregar();
-    try {
-      const response = await fetch("/api/workspace");
-      const data = await response.json();
-      if (response.status === 401) {
-        window.location.replace("/pages/login.html");
-        return;
-      }
-      if (!response.ok) throw new Error(data.message || "Não foi possível carregar os dados da conta.");
-      if (data.exists) {
-        if (!data.workspace || typeof data.workspace !== "object" || Array.isArray(data.workspace)) {
-          throw new Error("Os dados salvos da conta estão inválidos.");
+    if (modoLocal) {
+      try {
+        const email = localStorage.getItem("plandev:sessao:local:v1");
+        const usuarios = JSON.parse(localStorage.getItem("plandev:usuarios:local:v1") || "[]");
+        const usuario = Array.isArray(usuarios) && usuarios.find((item) => item.email === email);
+        if (!usuario) {
+          localStorage.removeItem("plandev:sessao:local:v1");
+          window.location.replace("login.html");
+          return;
         }
-        carregarWorkspace(data.workspace);
-        salvarLocal();
-      } else {
-        sincronizarWorkspace(JSON.stringify(S));
+        servidor = { email: usuario.email, nome: usuario.nome };
+        uid = String(usuario.email).toLowerCase();
+        carregar();
+      } catch (error) {
+        toast(error instanceof Error
+          ? `Não foi possível carregar o perfil salvo: ${error.message}`
+          : "Não foi possível carregar o perfil salvo.");
+        return;
       }
-    } catch (error) {
-      toast(error instanceof Error
-        ? `Não foi possível carregar os dados: ${error.message}`
-        : "Não foi possível carregar os dados da sua conta.");
-      return;
+      toast("Modo local: seus dados ficam salvos somente neste navegador.");
+    } else {
+      try {
+        const r = await fetch("/api/eu");
+        if (r.status === 401) {
+          window.location.replace("/pages/login.html");
+          return;
+        }
+        if (!r.ok) {
+          toast("Não foi possível carregar sua conta. Tente novamente.");
+          return;
+        }
+        servidor = await r.json();
+      } catch {
+        toast("Não foi possível conectar ao PlanDev. Abra o site pelo servidor e tente novamente.");
+        return;
+      }
+      if (!servidor || !servidor.email) {
+        toast("Não foi possível identificar sua conta. Entre novamente.");
+        window.location.replace("/pages/login.html");
+        return;
+      }
+      uid = String(servidor.email).toLowerCase();
+      carregar();
+      try {
+        const response = await fetch("/api/workspace");
+        const data = await response.json();
+        if (response.status === 401) {
+          window.location.replace("/pages/login.html");
+          return;
+        }
+        if (!response.ok) throw new Error(data.message || "Não foi possível carregar os dados da conta.");
+        if (data.exists) {
+          if (!data.workspace || typeof data.workspace !== "object" || Array.isArray(data.workspace)) {
+            throw new Error("Os dados salvos da conta estão inválidos.");
+          }
+          carregarWorkspace(data.workspace);
+          salvarLocal();
+        } else {
+          sincronizarWorkspace(JSON.stringify(S));
+        }
+      } catch (error) {
+        toast(error instanceof Error
+          ? `Não foi possível carregar os dados: ${error.message}`
+          : "Não foi possível carregar os dados da sua conta.");
+        return;
+      }
     }
 
     $("cfg-sessao").checked = S.cfg.sessao;
