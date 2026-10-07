@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlanDev | Dashboard</title>
-    <link rel="stylesheet" href="../src/dashboard-base.css" onerror="this.onerror=null;this.href='./dashboard-base.css'">
-    <link rel="stylesheet" href="../src/dashboard.css" onerror="this.onerror=null;this.href='./dashboard.css'">
+    <link rel="stylesheet" href="../static/css/dashboard-base.css">
+    <link rel="stylesheet" href="../static/css/dashboard.css">
 </head>
 <body class="dashboard-body">
     <canvas id="bg-code" aria-hidden="true"></canvas>
@@ -331,11 +331,6 @@
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-    <script>
-        const dashboardScript = document.createElement("script");
-        dashboardScript.src = location.hostname.endsWith("github.io") ? "./dashboard.js" : "../src/dashboard.js";
-        dashboardScript.async = false;
-        document.body.appendChild(dashboardScript);
-    </script>
+    <script src="../static/js/dashboard.js" defer></script>
 </body>
 </html>

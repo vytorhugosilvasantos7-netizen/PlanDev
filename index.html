@@ -6,11 +6,9 @@
     <title>PlanDev</title>
 </head>
 <body>
-    <p>Abrindo o PlanDev. Se não redirecionar, <a id="cadastro-link" href="cadastro.html">clique aqui</a>.</p>
+    <p>Abrindo o PlanDev. Se não redirecionar, <a id="cadastro-link" href="pages/cadastro.html">clique aqui</a>.</p>
     <script>
-        const paginaCadastro = location.hostname.endsWith("github.io")
-            ? "cadastro.html"
-            : "pages/cadastro.html";
+        const paginaCadastro = "pages/cadastro.html";
         document.getElementById("cadastro-link").href = paginaCadastro;
         location.replace(new URL(paginaCadastro, location.href));
     </script>

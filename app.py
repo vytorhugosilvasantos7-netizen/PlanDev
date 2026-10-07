@@ -29,7 +29,6 @@ else:
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 PAGES_DIR = BASE_DIR / "pages"
-SRC_DIR = BASE_DIR / "src"
 
 app = Flask(__name__)
 if os.environ.get("PLANDEV_SECRET_KEY"):
@@ -71,11 +70,6 @@ def page_files(filename):
     if filename == "dashboard.html" and "user" not in session:
         return redirect("/pages/login.html")
     return send_from_directory(str(PAGES_DIR), filename)
-
-
-@app.route("/src/<path:filename>")
-def src_files(filename):
-    return send_from_directory(str(SRC_DIR), filename)
 
 
 @app.route("/api/register", methods=["POST"])

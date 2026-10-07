@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlanDev | Entrar</title>
-    <link rel="stylesheet" href="../src/cadastro.css" onerror="this.onerror=null;this.href='./cadastro.css'">
+    <link rel="stylesheet" href="../static/css/cadastro.css">
 </head>
 <body>
     <canvas id="bg-code" aria-hidden="true"></canvas>
@@ -84,14 +84,8 @@
         </section>
     </main>
 
-    <script>
-        const staticAssets = location.hostname.endsWith("github.io");
-        ["cadastro.js", "bot.js", "auth.js"].forEach((file) => {
-            const script = document.createElement("script");
-            script.src = staticAssets ? `./${file}` : `../src/${file}`;
-            script.async = false;
-            document.body.appendChild(script);
-        });
-    </script>
+    <script src="../static/js/cadastro.js" defer></script>
+    <script src="../static/js/bot.js" defer></script>
+    <script src="../static/js/auth.js" defer></script>
 </body>
 </html>
