@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-tema="escuro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlanDev | Dashboard</title>
+    <link rel="stylesheet" href="../static/css/dashboard-base.css">
+    <link rel="stylesheet" href="../static/css/dashboard.css">
+</head>
+<body class="dashboard-body">
+    <canvas id="bg-code" aria-hidden="true"></canvas>
+
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand-box">
+                <button type="button" class="brand-avatar" id="brand-avatar" aria-label="Abrir configurações da conta">
+                    <img id="brand-avatar-img" alt="" hidden>
+                    <span id="brand-avatar-ini">?</span>
+                </button>
+                <div><p class="brand-label">PlanDev</p><small>workspace</small></div>
+            </div>
+
+            <nav class="nav" aria-label="Menu principal">
+                <a class="nav-item active" href="#" data-view="dashboard" aria-current="page">Dashboard</a>
+                <a class="nav-item" href="#" data-view="projetos">Projetos</a>
+                <a class="nav-item" href="#" data-view="portfolio">Portfolio</a>
+                <a class="nav-item" href="#" data-view="online">Projetos da comunidade</a>
+                <a class="nav-item" href="#" data-view="relatorios">Relatórios</a>
+                <a class="nav-item" href="#" data-view="pomodoro">Pomodoro</a>
+            </nav>
+
+            <div class="mini-card">
+                <p class="mini-label">Metas</p>
+                <strong id="mc-valor">0/0 metas</strong>
+                <span id="mc-pct">Nenhuma meta ainda</span>
+            </div>
+        </aside>
+
+        <main class="content">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">Painel principal</p>
+                    <h1 id="titulo">Bem-vindo ao seu workspace</h1>
+                </div>
+                <div class="topbar-actions">
+                    <button class="ghost-button" type="button" id="session-button">Iniciar foco</button>
+                    <a class="logout-link" href="login.html">Sair</a>
+                </div>
+            </header>
+
+            <div id="alertas" class="alertas" aria-live="polite"></div>
+
+            <section class="view-panel active" data-view="dashboard">
+                <section class="stats-grid">
+                    <article class="stat-card accent"><span class="stat-label">Projetos</span><strong id="st-projetos">00</strong><small id="sm-projetos"></small></article>
+                    <article class="stat-card"><span class="stat-label">Entrevistas próximas</span><strong id="st-entrevistas">00</strong><small id="sm-entrevistas"></small></article>
+                    <article class="stat-card"><span class="stat-label">Metas concluídas</span><strong id="st-metas">0%</strong><small id="sm-metas"></small></article>
+                    <article class="stat-card"><span class="stat-label">Sessões de foco</span><strong id="st-foco">00</strong><small id="sm-foco"></small></article>
+                </section>
+
+                <section class="main-grid">
+                    <div class="panel large-panel">
+                        <div class="panel-header"><h2>Próximas entrevistas</h2></div>
+                        <div class="kanban-stack" id="lista-prox"></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><h2>Progresso das metas</h2></div>
+                        <div class="ring-wrap"><div class="progress-ring" id="ring-metas"><span id="ring-val">0%</span></div></div>
+                        <ul class="mini-list">
+                            <li><span class="dot blue"></span><span id="rl-feitas">Concluídas: 0</span></li>
+                            <li><span class="dot green"></span><span id="rl-abertas">Em aberto: 0</span></li>
+                            <li><span class="dot yellow"></span><span id="rl-atrasadas">Atrasadas: 0</span></li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="bottom-grid">
+                    <div class="panel">
+                        <div class="panel-header"><h2>Projetos</h2><button class="text-button" type="button" id="btn-ver-projetos">Ver tudo</button></div>
+                        <div class="project-list" id="dash-projetos"></div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header"><h2>Terminal</h2><span class="pill dark">Online</span></div>
+                        <pre class="terminal-box"><code id="terminal"></code></pre>
+                    </div>
+                </section>
+            </section>
+
+            <section class="view-panel" data-view="online">
+                <div class="panel section-panel community-panel">
+                    <div class="panel-header">
+                        <div><h2>Projetos de outros programadores</h2><p class="dica">Veja projetos que outros programadores publicaram e experimente a prévia dos projetos Web.</p></div>
+                        <button class="ghost-button" type="button" id="community-refresh">Atualizar</button>
+                    </div>
+                    <p class="community-notice" id="community-notice" role="status"></p>
+                    <label class="community-search"><span>Buscar publicações</span><input type="search" id="community-search" placeholder="Nome, programador ou linguagem"></label>
+                    <div class="community-columns">
+                        <section>
+                            <h3>Projetos publicados pela comunidade</h3>
+                            <div class="community-list" id="community-projects"></div>
+                        </section>
+                        <section>
+                            <h3>Portfólios publicados</h3>
+                            <div class="community-list" id="community-portfolios"></div>
+                        </section>
+                    </div>
+                    <div class="runner" id="runner-online" hidden></div>
+                </div>
+            </section>
+
+            <section class="view-panel" data-view="projetos">
+                <div class="panel section-panel project-panel">
+                    <div class="panel-header"><h2>Projetos</h2></div>
+
+                    <form id="project-form" class="project-form">
+                        <div class="field-row">
+                            <label><span>Nome do projeto</span><input type="text" id="project-name" maxlength="80" placeholder="Ex: PlanDev" required></label>
+                            <div class="language-picker">
+                                <span>Linguagens usadas no projeto</span>
+                                <span class="language-options" id="project-language-options">
+                                    <label><input type="checkbox" name="project-language" value="Web (HTML, CSS e JavaScript)"> Web (HTML, CSS e JavaScript)</label>
+                                    <label><input type="checkbox" name="project-language" value="TypeScript"> TypeScript</label>
+                                    <label><input type="checkbox" name="project-language" value="Python"> Python</label>
+                                    <label><input type="checkbox" name="project-language" value="Java"> Java</label>
+                                    <label><input type="checkbox" name="project-language" value="C"> C</label>
+                                    <label><input type="checkbox" name="project-language" value="C++"> C++</label>
+                                    <label><input type="checkbox" name="project-language" value="C#"> C#</label>
+                                    <label><input type="checkbox" name="project-language" value="PHP"> PHP</label>
+                                    <label><input type="checkbox" name="project-language" value="Ruby"> Ruby</label>
+                                    <label><input type="checkbox" name="project-language" value="Go"> Go</label>
+                                    <label><input type="checkbox" name="project-language" value="Rust"> Rust</label>
+                                    <label><input type="checkbox" name="project-language" value="Kotlin"> Kotlin</label>
+                                    <label><input type="checkbox" name="project-language" value="Swift"> Swift</label>
+                                    <label><input type="checkbox" name="project-language" value="SQL"> SQL</label>
+                                </span>
+                                <input type="text" id="project-language-custom" maxlength="300" placeholder="Outras linguagens, separadas por vírgula" aria-label="Outras linguagens">
+                            </div>
+                        </div>
+                        <label><span>Detalhes</span><textarea id="project-details" rows="3" maxlength="1000" placeholder="Objetivo, funcionalidades e stack..." required></textarea></label>
+
+                        <div class="project-code-editors" id="project-code-editors"></div>
+                        <small class="dica" id="project-code-help" hidden></small>
+                        <small class="dica">Ao publicar, o nome, os detalhes, as linguagens e o código preenchido deste projeto ficam visíveis para todos. Você pode retirar a publicação depois.</small>
+
+                        <div class="field-row compact-row">
+                            <label><span>Status</span>
+                                <select id="project-status">
+                                    <option value="Em andamento">Em andamento</option>
+                                    <option value="Concluído">Concluído</option>
+                                    <option value="Planejado">Planejado</option>
+                                </select>
+                            </label>
+                            <div class="form-actions">
+                                <button type="button" class="ghost-button" id="project-run" hidden>Rodar projeto</button>
+                                <button type="submit" class="primary-button">Adicionar projeto</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div id="runner-proj" class="runner" hidden></div>
+                    <div id="project-list" class="project-list project-list-grid"></div>
+                </div>
+            </section>
+
+            <section class="view-panel" data-view="portfolio">
+                <div class="panel section-panel portfolio-panel">
+                    <div class="panel-header"><h2>Portfolio</h2></div>
+
+                    <form id="portfolio-form" class="project-form portfolio-form">
+                        <div class="field-row">
+                            <label><span>Seu nome</span><input type="text" id="portfolio-name" maxlength="60" placeholder="Seu nome" required></label>
+                            <label><span>Especialidade</span><input type="text" id="portfolio-role" maxlength="60" placeholder="Sua especialidade" required></label>
+                        </div>
+                        <label><span>Sobre mim</span><textarea id="portfolio-bio" rows="3" maxlength="600" placeholder="Conte um pouco sobre você" required></textarea></label>
+                        <label><span>Habilidades (separadas por vírgula)</span><input type="text" id="portfolio-skills" maxlength="300" placeholder="Ex: HTML, CSS, JavaScript" required></label>
+                        <button type="submit" class="primary-button">Atualizar portfolio</button>
+                    </form>
+                    <div class="publish-controls">
+                        <button class="ghost-button" type="button" id="portfolio-publish">Publicar meu portfólio</button>
+                        <small class="dica">Ao publicar, seu nome, especialidade, descrição e habilidades ficarão visíveis para todos na comunidade. Seu e-mail não será exibido.</small>
+                    </div>
+
+                    <div class="portfolio-preview">
+                        <div class="portfolio-header-card">
+                            <div><p class="portfolio-label">Portfolio</p><h3 id="portfolio-preview-name"></h3></div>
+                            <span id="portfolio-preview-role"></span>
+                        </div>
+                        <p id="portfolio-preview-bio" class="portfolio-bio"></p>
+                        <div class="portfolio-tags" id="portfolio-preview-skills"></div>
+                    </div>
+
+                    <form id="portfolio-code-form" class="project-form">
+                        <div class="panel-header"><h2>Rodar e verificar meu portfolio</h2></div>
+                        <div class="code-grid">
+                            <label><span>HTML</span><textarea id="port-html" class="code" rows="10" maxlength="50000" spellcheck="false"></textarea></label>
+                            <label><span>CSS</span><textarea id="port-css" class="code" rows="10" maxlength="50000" spellcheck="false"></textarea></label>
+                            <label><span>JavaScript</span><textarea id="port-js" class="code" rows="10" maxlength="50000" spellcheck="false"></textarea></label>
+                        </div>
+                        <button type="submit" class="primary-button">Rodar e verificar</button>
+                    </form>
+
+                    <div id="runner-port" class="runner" hidden></div>
+                    <div id="port-resumo" class="dica" hidden></div>
+                    <ul id="checks" class="checks" hidden></ul>
+                </div>
+            </section>
+
+            <section class="view-panel" data-view="relatorios">
+                <div class="panel section-panel">
+                    <div class="panel-header"><h2>Relatórios</h2></div>
+                    <div class="report-grid">
+                        <div class="report-card"><span>Entrevistas agendadas</span><strong id="rp-ent">0</strong></div>
+                        <div class="report-card"><span>Metas concluídas</span><strong id="rp-metas">0%</strong></div>
+                        <div class="report-card"><span>Tempo focado</span><strong id="rp-foco">0 min</strong></div>
+                    </div>
+
+                    <h3 class="sub">Entrevistas</h3>
+                    <div class="rel-grid">
+                        <div class="cal-box">
+                            <div class="cal-head">
+                                <button type="button" class="text-button sm" id="cal-prev" aria-label="Mês anterior">&lsaquo;</button>
+                                <strong id="cal-titulo"></strong>
+                                <button type="button" class="text-button sm" id="cal-next" aria-label="Próximo mês">&rsaquo;</button>
+                            </div>
+                            <div class="cal-grid" id="cal-grid"></div>
+                        </div>
+                        <div>
+                            <form id="ent-form" class="project-form">
+                                <div class="field-row">
+                                    <label><span>Empresa</span><input type="text" id="ent-empresa" maxlength="80" placeholder="Ex: Nubank" required></label>
+                                    <label><span>Vaga / observações</span><input type="text" id="ent-notas" maxlength="200" placeholder="Ex: Dev Jr, online"></label>
+                                </div>
+                                <div class="field-row">
+                                    <label><span>Data (DD/MM/AAAA)</span><input type="text" id="ent-data" inputmode="numeric" autocomplete="off" placeholder="DD/MM/AAAA" pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}" title="Digite a data como dia/mês/ano, por exemplo 25/10/2026" maxlength="10" required></label>
+                                    <label><span>Hora</span><input type="time" id="ent-hora"></label>
+                                </div>
+                                <button type="submit" class="primary-button">Agendar entrevista</button>
+                            </form>
+                            <div class="kanban-stack" id="ent-lista"></div>
+                        </div>
+                    </div>
+
+                    <h3 class="sub">Metas</h3>
+                    <form id="meta-form" class="project-form">
+                        <div class="field-row compact-row">
+                            <label><span>Meta</span><input type="text" id="meta-titulo" maxlength="100" placeholder="Ex: Terminar o portfolio" required></label>
+                            <label><span>Prazo (opcional)</span><input type="date" id="meta-prazo"></label>
+                        </div>
+                        <button type="submit" class="primary-button">Adicionar meta</button>
+                    </form>
+                    <div class="barra" aria-hidden="true"><i id="meta-barra"></i></div>
+                    <small class="dica" id="meta-resumo"></small>
+                    <div class="kanban-stack" id="meta-lista"></div>
+                </div>
+            </section>
+
+            <section class="view-panel" data-view="configuracoes">
+                <div class="panel section-panel">
+                    <div class="perfil-topo">
+                        <button type="button" class="avatar-btn" id="avatar-btn" aria-expanded="false" aria-controls="perfil-menu" aria-label="Abrir menu do perfil">
+                            <img id="avatar-img" class="avatar-img" alt="" hidden>
+                            <span id="avatar-ini">?</span>
+                        </button>
+                        <div><strong id="perfil-nome">Seu perfil</strong><small id="perfil-email"></small></div>
+                    </div>
+
+                    <div id="perfil-menu" class="perfil-menu" hidden>
+                        <button type="button" data-set="config">Configurações</button>
+                        <button type="button" data-set="conta">Modificar conta</button>
+                        <button type="button" data-set="tema">Tema</button>
+                        <button type="button" data-set="sobre">Sobre</button>
+                    </div>
+
+                    <div class="set-painel" data-set-painel="config" hidden>
+                        <div class="settings-list">
+                            <label class="setting-row"><span>Aviso ao terminar o foco</span><input type="checkbox" id="cfg-sessao"></label>
+                            <label class="setting-row"><span>Aviso ao terminar a pausa</span><input type="checkbox" id="cfg-pausa"></label>
+                            <label class="setting-row"><span>Avisos de entrevista no navegador</span><input type="checkbox" id="cfg-avisos"></label>
+                        </div>
+                    </div>
+
+                    <div class="set-painel" data-set-painel="conta" hidden>
+                        <form id="conta-form" class="project-form">
+                            <label><span>Nome de exibição</span><input type="text" id="conta-nome" maxlength="60" placeholder="Seu nome"></label>
+                            <label><span>E-mail</span><input type="email" id="conta-email" disabled placeholder="Disponível ao entrar com sua conta"></label>
+                            <label><span>Foto de perfil</span><input type="file" id="conta-foto" accept="image/png,image/jpeg,image/webp,image/gif"></label>
+                            <div class="form-actions">
+                                <button type="button" class="ghost-button" id="conta-remover">Remover foto</button>
+                                <button type="submit" class="primary-button">Salvar</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="set-painel" data-set-painel="tema" hidden>
+                        <div class="tema-opcoes">
+                            <button type="button" data-tema="escuro" aria-pressed="true">Preto</button>
+                            <button type="button" data-tema="claro" aria-pressed="false">Branco</button>
+                        </div>
+                    </div>
+
+                    <div class="set-painel sobre" data-set-painel="sobre" hidden>
+                        <h3>Sobre o PlanDev</h3>
+                        <p>O PlanDev é um workspace para quem programa: um lugar para organizar projetos, mostrar seu código funcionando, preparar o portfolio, acompanhar entrevistas e manter as metas em dia.</p>
+                        <p>Você cola o HTML, CSS e JavaScript do projeto e ele roda na hora, numa área isolada e segura. O portfolio ainda passa por uma verificação que aponta o que falta para ficar em perfeitas condições.</p>
+                        <p>A comunidade exibe apenas projetos e portfólios que seus donos escolheram publicar. Seu e-mail não é exibido publicamente. A comunidade compartilhada exige o backend PlanDev hospedado; GitHub Pages sozinho não oferece banco ou API.</p>
+                        <p>A agenda de entrevistas avisa quando o dia se aproxima e quando chega. O Pomodoro ajuda a estudar com foco.</p>
+                        <small>Feito com HTML, CSS e JavaScript.</small>
+                    </div>
+                </div>
+            </section>
+
+            <section class="view-panel" data-view="pomodoro">
+                <div class="panel section-panel pomodoro-panel">
+                    <div class="panel-header"><h2>Pomodoro para estudar</h2></div>
+                    <div class="pomodoro-box">
+                        <div class="pomodoro-mode">
+                            <button class="mode-button active" data-mode="work" type="button">Foco</button>
+                            <button class="mode-button" data-mode="shortBreak" type="button">Pausa curta</button>
+                            <button class="mode-button" data-mode="longBreak" type="button">Pausa longa</button>
+                        </div>
+                        <div class="timer-ring"><span id="timer-display">25:00</span></div>
+                        <div class="pomodoro-controls">
+                            <button id="start-pause" type="button">Iniciar</button>
+                            <button id="reset-timer" class="secondary" type="button">Resetar</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script src="../static/js/dashboard.js" defer></script>
+</body>
+</html>

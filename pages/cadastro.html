@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlanDev | Cadastro</title>
+    <link rel="stylesheet" href="../static/css/cadastro.css">
+</head>
+<body>
+    <canvas id="bg-code" aria-hidden="true"></canvas>
+
+    <main class="cadastro-page">
+        <section class="cadastro-intro">
+            <p class="eyebrow">PlanDev</p>
+            <h1>Cadastre-se</h1>
+            <h2>tire ideias da cabeça<br>e vamos codar juntos!</h2>
+
+            <ul class="beneficios">
+                <li>Organize seus projetos e ideias</li>
+                <li>Defina metas e prazos com clareza</li>
+                <li>Colabore com outros desenvolvedores</li>
+            </ul>
+
+            <div class="dev-bot" aria-hidden="true">
+                <p class="dev-bubble" id="bot-bubble">console.log("oi!");</p>
+                <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="100" y1="16" x2="100" y2="32" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+                    <circle class="ant" cx="100" cy="11" r="6" fill="#fff"/>
+                    <rect x="50" y="128" width="100" height="80" rx="22" fill="#1f1f1f" stroke="#fff" stroke-width="2"/>
+                    <text x="100" y="178" text-anchor="middle" fill="#fff" font-family="Courier New, monospace" font-size="18" font-weight="700">&lt;/&gt;</text>
+                    <g id="bot-head">
+                        <rect x="26" y="62" width="10" height="36" rx="5" fill="#d4d4d4"/>
+                        <rect x="164" y="62" width="10" height="36" rx="5" fill="#d4d4d4"/>
+                        <rect x="36" y="30" width="128" height="100" rx="28" fill="#f5f5f5" stroke="#fff" stroke-width="2"/>
+                        <rect x="48" y="46" width="104" height="68" rx="18" fill="#0a0a0a"/>
+                        <g class="eye-grp"><circle class="eye" cx="75" cy="76" r="15" fill="#fff"/><circle class="pupil" cx="75" cy="76" r="7" fill="#0a0a0a"/></g>
+                        <g class="eye-grp"><circle class="eye" cx="125" cy="76" r="15" fill="#fff"/><circle class="pupil" cx="125" cy="76" r="7" fill="#0a0a0a"/></g>
+                        <path class="m-smile" d="M84 101 Q100 111 116 101" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+                        <path class="m-happy" d="M82 98 Q100 120 118 98 Z" fill="#fff"/>
+                        <ellipse class="m-o" cx="100" cy="102" rx="5" ry="6" fill="#fff"/>
+                    </g>
+                    <rect class="arm arm-l" x="55" y="66" width="40" height="150" rx="18" fill="#e5e5e5" stroke="#0a0a0a" stroke-width="2"/>
+                    <rect class="arm arm-r" x="105" y="66" width="40" height="150" rx="18" fill="#e5e5e5" stroke="#0a0a0a" stroke-width="2"/>
+                    <rect x="40" y="170" width="120" height="44" rx="10" fill="#fafafa" stroke="#0a0a0a" stroke-width="2"/>
+                    <circle cx="100" cy="192" r="6" fill="#0a0a0a"/>
+                </svg>
+            </div>
+        </section>
+
+        <section class="cadastro-card">
+            <div class="card-header">
+                <h3>Criar conta</h3>
+                <p>Comece hoje a planejar seus projetos.</p>
+            </div>
+
+            <form class="cadastro-form" id="cadastro-form">
+                <div class="campo">
+                    <label for="nome">Nome completo</label>
+                    <input id="nome" name="nome" type="text" placeholder="Digite seu nome" required>
+                </div>
+
+                <div class="campo">
+                    <label for="email">E-mail</label>
+                    <input id="email" name="email" type="email" placeholder="seu@email.com" required>
+                </div>
+
+                <div class="campo">
+                    <label for="senha">Senha</label>
+                    <input id="senha" name="senha" type="password" placeholder="Crie uma senha" required>
+                </div>
+
+                <div class="campo">
+                    <label for="confirmar-senha">Confirmar senha</label>
+                    <input id="confirmar-senha" name="confirmar-senha" type="password" placeholder="Repita a senha" required>
+                </div>
+
+                <button type="submit">Criar conta</button>
+            </form>
+
+            <aside class="demo-account" aria-label="Acesso de demonstração">
+                <p class="demo-title">Quer testar antes?</p>
+                <p>Entre na conta de demonstração sem criar uma conta.</p>
+                <dl>
+                    <div><dt>E-mail</dt><dd>teste@plandev.local</dd></div>
+                    <div><dt>Senha</dt><dd>PlanDevTeste2026!</dd></div>
+                </dl>
+                <button class="demo-button" id="demo-login-button" type="button">
+                    Entrar na conta de teste
+                </button>
+            </aside>
+
+            <p class="login-link">Já tem conta? <a href="login.html">Entrar</a></p>
+        </section>
+    </main>
+
+    <script src="../static/js/cadastro.js" defer></script>
+    <script src="../static/js/bot.js" defer></script>
+    <script src="../static/js/auth.js" defer></script>
+</body>
+</html>
