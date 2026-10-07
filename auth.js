@@ -1,7 +1,7 @@
 const iniciarAutenticacao = () => {
   const cadastroForm = document.getElementById('cadastro-form');
   const loginForm = document.getElementById('login-form');
-  const modoLocal = window.location.protocol === 'file:' || window.location.hostname.endsWith('github.io');
+  const modoLocal = window.location.protocol === 'file:' || ['github.io', 'netlify.app'].some((d) => window.location.hostname.endsWith(d));
   const CHAVE_USUARIOS = 'plandev:usuarios:local:v1';
   const CHAVE_SESSAO = 'plandev:sessao:local:v1';
   const ITERACOES_HASH = 120000;

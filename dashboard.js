@@ -62,7 +62,7 @@
   });
   let uid = "local";
   let servidor = null;
-  const modoLocal = window.location.protocol === "file:" || window.location.hostname.endsWith("github.io");
+  const modoLocal = window.location.protocol === "file:" || ["github.io", "netlify.app"].some((d) => window.location.hostname.endsWith(d));
   let publicacoesOnline = [];
   let S = padrao();
   let salvarTimer = null;
